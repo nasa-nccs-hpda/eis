@@ -21,7 +21,12 @@ FROM: ./core-2.1.0.sif
 10)GPU:            cudatoolkit, tensorflow-gpu, rapids-blazing
 ===========================================================================
 
+%environment
+    # set PYTHONPATH for access to EIS Data Conversion utilities
+    export PYTHONPATH="$PYTHONPATH:/usr/local/eis_smce"
+
 %post
+    python -m pip install --upgrade awscli
     python -m pip install --upgrade boto3
     python -m pip install --upgrade urllib3
     python -m pip install --upgrade requests
@@ -51,7 +56,10 @@ FROM: ./core-2.1.0.sif
 #    python -m pip install --upgrade rapids-blazing
 
 
-
+    # retrieve EIS SMCE Data Conversion source from git repository and open permissions
+    mkdir -p /usr/local/eis_smce
+    git clone --single-branch --branch main https://github.com/nasa-nccs-cds/eis_smce.git /usr/local/eis_smce
+    chmod a+rwx -R /usr/local/eis_smce
 
 
 
