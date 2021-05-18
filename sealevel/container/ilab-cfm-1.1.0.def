@@ -1,0 +1,65 @@
+## Generate CFM container
+Bootstrap: localimage
+FROM: ./ilab-cfm-1.0.0.sif
+
+%labels
+    Author gtamkin/jli
+    Version v1.1.0
+
+%help
+===========================================================================
+	- ilab-cfm (extends -> ilab-cfm) 
+		i. adds CFM dependencies:
+			a.	s3fs
+			b.	zarr
+ 		ii. adds sample script & files:
+			a.      /CFM_main/main.v1.py
+                	b.      /CFM_main/CFMinput/latlon_sample_list.txt
+		iii. adds $test section
+===========================================================================
+
+%environment
+    # set PYTHONPATH for access to CFM application
+    export PYTHONPATH=$PYTHONPATH:"/usr/local/cfm:/usr/local/cfm/CFM_main"
+    export PATH=$PATH:"/usr/local/cfm/CFM_main"
+
+%files
+
+    # copy file from host
+    /home/ubuntu/CFM/container/latlon_sample_list.txt /mnt/latlon_sample_list.txt
+    /home/ubuntu/CFM/container/main.v1.py /mnt/main.v1.py
+
+
+%post
+
+    #pip install CFM dependencies
+    pip install --upgrade s3fs==2021.4.0
+    pip install --upgrade zarr==2.8.1
+
+    # move files to CFM location
+    mv /mnt/main.v1.py /usr/local/cfm/CFM_main/main.v1.py
+    mv /mnt/latlon_sample_list.txt /usr/local/cfm/CFM_main/CFMinput/latlon_sample_list.txt
+
+    # open permissions
+    chmod a+rwx /usr/local/cfm/CFM_main/main.v1.py
+    chmod a+rws /usr/local/cfm/CFM_main/CFMinput/latlon_sample_list.txt
+    cd /usr/local/cfm/CFM_main
+
+%test
+
+    echo 'General System Information:'
+    uname -a
+
+    echo 'Linux Version:'
+    cat /etc/os-release
+
+    echo 'Python Version:'
+    python -V
+
+    echo 'Singularity Version:'
+    singularity --version
+
+    echo 'Valid CFM Dependencies:'
+    python -c 'import h5py; import numpy; import scipy; import pandas;\
+               import xarray; import netCDF4; import glob; import boto3;\
+               import botocore; import s3fs; print("Passed")'
