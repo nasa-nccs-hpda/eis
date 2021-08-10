@@ -1,44 +1,46 @@
-READme for running EIS SMCE zarr conversion software on a container
+READme for running EIS Zarr conversion software on a container
 
 1) Log onto Discover
 >> ssh discover.nccs.nasa.gov
 
-2)  Navigate to your nobackup directory
->> cd $NOBACKUP
->> mkdir containers
->> cd $NOBACKUP/containers
+2) Change to your directory and directory list out the new container
+>> /discover/nobackup/projects/eis_freshwater/bmcandr/datamove/containers> l eis_zarr.sif
+-rwxr-xr-x 1 sstrong s2443 4076212224 Aug 10 13:07 eis_zarr.sif*
 
-3) copy container, zc.cfg, and eis_smce_zarr_conv_1.0.2.sbatch files 
->> cp /discover/nobackup/sstrong/containers/eis-dev-1.0.2.sif .
->> cp /discover/nobackup/sstrong/eis_delivery/*.* .
-
-4) Edit the zc.cfg. Change the output_dir path (shown below) to your desired output location:
+3) Copy the "zc.cfg_chunks" to "zc.cfg". *Note the old zc.cfg is deprecated for new container and also note the quoted strings. Change t
+he output_dir path (shown below) to your desired output location:
+>> cp zc.cfg_chunks zc.cfg
 >> vi zc.cfg (or editor of choice)
-cache       = /gpfsm/dnb43/projects/p151/zarr
-time_format = %Y%m%d%H%M
+cache       = "/gpfsm/dnb43/projects/p151/zarr"
+time_format = "%Y%m%d%H%M"
 batch_size  = 1000
-merge_dim   = time
-bucket      = eis-dh-hydro
-input_dir   = /discover/nobackup/projects/eis_freshwater
-output_dir  = /discover/nobackup/<username>/output/zarr
-input_dset  = lahmers/RUN/1km_DOMAIN_DAens20_MCD15A2H.006_2019Flood/OUTPUT/SURFACEMODEL/**/LIS_HIST*.nc
-output_dset = LIS/DA_1km/MODIS_Flood_2019/SURFACEMODEL/LIS_HIST.d01
+merge_dim   = "time"
+bucket      = "eis-dh-hydro"
+input_dir   = "/discover/nobackup/projects/eis_freshwater"
+output_dir  = "/discover/nobackup/sstrong/containers/output/zarr_chunk"
+input_dset  = "lahmers/RUN/1km_DOMAIN_DAens20_MCD15A2H.006_2019Flood/OUTPUT/SURFACEMODEL/**/LIS_HIST*.nc"
+output_dset = "LIS/DA_1km/MODIS_Flood_2019/SURFACEMODEL/LIS_HIST.d01"
+cat_name    = "LIS.1km_DOMAIN_DAens20_MCD15A2H.006_2019Flood.SURFACEMODEL"
+chunks      =  { "time": 25, "north_south": 100, "east_west": 100 }
 
-5) Edit the eis_smce_zarr_conv_1.0.2.sbatch script. 
+4) Edit the eis_zarr.sbatch script. Make sure you are pointing to eis_zarr.sif and proper zc.cfg. 
 #Modify the directory paths to your local path accordingly
-singularity exec -B /discover/nobackup/bmcandr1:/discover/nobackup/bmcandr1,/discover/nobackup/projects/eis_freshwater/lahmers:/discover/nobackup/projects/eis_freshwater/lahmers /discover/nobackup/bmcandr1/containers/eis-dev-1.0.2.sif python /usr/local/eis_smce/workflows/zarr_conversion.py /discover/nobackup/bmcandr1/containers/zc.cfg
+#Change the directory paths to config file accordingly.
+singularity exec -B /discover/nobackup/sstrong:/discover/nobackup/sstrong,/discover/nobackup/projects/eis_freshwater/lahmers:/discover/n
+obackup/projects/eis_freshwater/lahmers /discover/nobackup/projects/eis_freshwater/bmcandr/datamove/containers/eis_zarr.sif python /usr/
+local/eis_smce/workflows/zarr_conversion.py /discover/nobackup/projects/eis_freshwater/bmcandr/datamove/containers/zc.cfg
 
-6) Run the batch script
+5) Run the batch script
 
->> sbatch --nodes=1 --time=12:00:00 eis_smce_zarr_conv_1.0.2.sbatch
+>> sbatch --nodes=1 --time=12:00:00 eis_zarr.sbatch
 
-7) Output
+6) Output
 zarr.err
 zarr.out
 
-8) Results
+7) Results
 
-sstrong@discover33:/discover/nobackup/sstrong/containers/output/zarr/LIS/DA_1km/MODIS_Flood_2019/SURFACEMODEL/LIS_HIST.d01.zarr> l
+sstrong@discover33:/discover/nobackup/sstrong/containers/output/zarr_chunk/LIS/DA_1km/MODIS_Flood_2019/SURFACEMODEL/LIS_HIST.d01.zarr> l
 total 1536
 drwx------ 27 sstrong k3000 32768 May 19 11:52 ./
 drwx------  3 sstrong k3000   512 May 19 11:52 ../
@@ -70,5 +72,3 @@ drwx------  2 sstrong k3000 32768 May 19 11:55 TWS_tavg/
 -rw-------  1 sstrong k3000   655 May 19 11:52 .zattrs
 -rw-------  1 sstrong k3000    24 May 19 11:52 .zgroup
 -rw-------  1 sstrong k3000 26752 May 19 11:52 .zmetadata
-
-
