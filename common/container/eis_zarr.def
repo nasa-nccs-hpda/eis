@@ -56,11 +56,13 @@ FROM: ./core-2.1.0.sif
     python -m pip install --upgrade tensorflow-gpu
 #    python -m pip install --upgrade rapids-blazing
 # added 5/10/21: commenting back out because they are most likely included in core
-#    python -m pip install --upgrade numpy
-#    python -m pip install --upgrade dask
-#    python -m pip install --upgrade xarray
+    python -m pip install --upgrade numpy
+    python -m pip install --upgrade dask
+    python -m pip install --upgrade xarray
 # added 5/11/21: Tom sent email requesting dask-jobqueue 
     python -m pip install --upgrade dask-jobqueue  
+# 8/6/21 adding what fails on discover run
+    python -m pip install --upgrade numexpr==2.7.0
 
 
     # retrieve EIS SMCE Data Conversion source from git repository and open permissions
