@@ -11,4 +11,4 @@ export SINGULARITY_CACHEDIR="$NOBACKUP/containers/.singularity"
 export SINGULARITY_TMPDIR="$NOBACKUP/containers/.singularity"
 
 #Change the directory paths to your local path accordingly
-singularity exec -B /discover/nobackup/bmcandr1:/discover/nobackup/bmcandr1,/discover/nobackup/projects/eis_freshwater/lahmers:/discover/nobackup/projects/eis_freshwater/lahmers /discover/nobackup/bmcandr1/containers/eis-dev-1.0.3.7.sif python /usr/local/eis_smce/workflows/zarr_conversion.py /discover/nobackup/bmcandr1/containers/zc.cfg
+singularity exec -B /discover/nobackup/bmcandr1:/discover/nobackup/bmcandr1,/discover/nobackup/projects/eis_freshwater/lahmers:/discover/nobackup/projects/eis_freshwater/lahmers /discover/nobackup/bmcandr1/containers/eis_zarr.sif python /usr/local/eis_smce/workflows/zarr_conversion.py /discover/nobackup/bmcandr1/containers/zc.cfg
